@@ -1,30 +1,94 @@
-# React + TypeScript + Vite
+# simple-dnd
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
 
-Currently, two official plugins are available:
+This is a simple example of the basic of drag and drop in react. Here contain two example with one is using react's `onDrag` prop and the other is using `addEventListener` to handle the drag and drop event.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Usage
 
-## Expanding the ESLint configuration
+1. For the wrapper one, you need to wrap the content like this
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+```jsx
+  <div>
+        <DnDContext onDragEnd={OnDragEnd}>
+          {Object.entries(table).map(([key, value]) => {
+            return (
+              <Droppable
+                className="border-black border p-5 m-5"
+                droppableId={key}
+                key={key}
+                // WrapperTag={Wrapper}
+              >
+                {(droppableContext) => {
+                  {
+                    return value.map((content, index) => (
+                      <Draggable
+                        draggableId={content}
+                        key={content}
+                        droppableContext={droppableContext}
+                        index={index}
+                      >
+                        {content}
+                      </Draggable>
+                    ));
+                  }
+                }}
+              </Droppable>
+            );
+          })}
+        </DnDContext>
+      </div>
+```
 
-- Configure the top-level `parserOptions` property like this:
+2. For the hook one, in each component you need to use the hook like this:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+```jsx
+const App = () => {
+	const [table, setTable] = useState<{ [key: DnDId]: string[] }>({
+		1: ['aaa', 'bbb'],
+		2: ['ccc', 'ddd'],
+		3: ['eee', 'ggg'],
+	});
+
+	const OnDragEnd = (result) => {
+    // some code
+	};
+
+	return (
+		<DndContext onDragEnd={OnDragEnd}>
+			{Object.entries(table).map(([key, value], index) => {
+				return (
+					<Column className='border-black border p-5 m-5' dndId={key} key={index}>
+						{value.map((content, index) => (
+							<Card dndId={index} key={content + index + key}>{content}</Card>
+						))}
+					</Column>
+				);
+			})}
+		</DndContext>
+	);
+}
+
+const Column = ({children}) => {
+  const { dropRef, isOver } = useDroppable({id});
+  return (
+    <div ref={dropRef} className={`border p-5 m-5 ${isOver ? 'bg-gray-200' : ''}`}>
+      {children}
+    </div>
+  )
+}
+
+const Draggable = ({children}) => {
+  const { dragRef, isDragging } = useDraggable({id});
+  return (
+    <div ref={dragRef} className="border p-5 m-5">
+      {children}
+    </div>
+  )
 }
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Reference
+
+- [dnd-kit](https://github.com/clauderic/dnd-kit)
+- [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd)

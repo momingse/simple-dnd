@@ -39,7 +39,6 @@ const DnDContext: FC<DnDContextProps> = ({ onDragEnd, children }) => {
       source: source.current!,
       destination,
     };
-    console.log(result);
 
     onDragEnd(result);
   };

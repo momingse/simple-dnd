@@ -5,6 +5,7 @@ type DroppableProps = {
   children?: (droppableContext: DroppableContext) => ReactNode;
   className?: HTMLProps<HTMLElement>["className"];
   droppableId: number | string;
+  WrapperTag?: JSX.ElementType;
 };
 
 export type DroppableContext = {
@@ -15,9 +16,11 @@ const Droppable: FC<DroppableProps> = ({
   children,
   className = "",
   droppableId,
+  WrapperTag = "div",
 }) => {
   const { onDragEnd, setSoure } = useContext(ContextStore);
   const handleOnDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log("drop");
     e.stopPropagation();
     e.preventDefault();
     const destination: DnDInfo = { id: droppableId, index: 0 };
@@ -43,13 +46,13 @@ const Droppable: FC<DroppableProps> = ({
   };
 
   return (
-    <div
+    <WrapperTag
       className={className}
       onDrop={handleOnDrop}
       onDragOver={handleOnDragOver}
     >
       {children && children(droppableContext)}
-    </div>
+    </WrapperTag>
   );
 };
 
